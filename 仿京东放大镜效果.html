@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        .wrapper{
+            width: 500px;
+            height: 500px;
+            border: 1px solid #ccc;
+            margin: 50px 0 0 100px;
+            position: relative;
+        }
+
+        .image{
+            width: 500px;
+            height: 500px;
+        }
+
+        .cover{
+            width: 300px;
+            height: 300px;
+            background-color: rgb(207, 248, 111);
+            opacity: .5;
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: move;
+        }
+
+        .big{
+            width: 600px;
+            height: 600px;
+            border: 1px solid #ccc;
+            position: absolute;
+            top: 0;
+            left: 510px;
+            overflow: hidden;
+        }
+
+        .bigImg{
+            width: 1000px;
+            height: 1000px;
+            position: absolute;
+            top: 0;
+            left: 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <img class="image" src="https://img10.360buyimg.com/n12/s800x800_jfs/t1/85203/17/16688/176934/614be5bfE28ca6187/6699eda01a9871e3.jpg" alt="">
+        <div class="cover"></div>
+        <div class="big">
+            <img class="bigImg" src="https://img10.360buyimg.com/n12/s800x800_jfs/t1/85203/17/16688/176934/614be5bfE28ca6187/6699eda01a9871e3.jpg" alt="">
+        </div>
+    </div>
+    
+
+    <script>
+        var image = document.querySelector('.image');
+        var cover = document.querySelector('.cover');
+        var big = document.querySelector('.big');
+        var wrapper = document.querySelector('.wrapper');
+
+        wrapper.addEventListener('mouseover',function() {
+            cover.style.display = 'block';
+            big.style.display = 'block';
+        });
+        wrapper.addEventListener('mouseout',function() {
+            cover.style.display = 'none';
+            big.style.display = 'none';
+        });
+
+        //获取鼠标在盒子中的坐标
+        wrapper.addEventListener('mousemove',function(e) {
+            var x = e.pageX - wrapper.offsetLeft;
+            var y = e.pageY - wrapper.offsetTop;
+            //覆盖层移动的距离
+            var coverX = x - (cover.offsetWidth / 2);
+            var coverY = y - (cover.offsetHeight / 2);
+            if (coverX <= 0) {
+                coverX = 0;
+            } else if(coverX >= 200) {
+                coverX = 200;
+            }
+            if (coverY <= 0) {
+                coverY = 0;
+            } else if(coverY >= 200) {
+                coverY = 200;
+            }
+            //给覆盖层赋值
+            cover.style.left = coverX + 'px';
+            cover.style.top = coverY + 'px';
+            
+            //大图片移动距离 = 遮挡层移动距离 * 大图片最大移动距离 / 遮挡层最大移动距离
+
+            //大图片最大移动距离
+            var bigImg = document.querySelector('.bigImg');
+            var bigMax = bigImg.offsetWidth - big.offsetWidth;
+
+            //遮挡层最大移动距离
+            var coverMax = wrapper.offsetWidth - cover.offsetWidth;
+
+            //大图片移动距离
+            var bigX = coverX * bigMax / coverMax;
+            var bigY = coverY * bigMax / coverMax;
+            //赋值
+            bigImg.style.left = -bigX + 'px';
+            bigImg.style.top = -bigY + 'px';
+        });
+    </script>
+</body>
+</html>
