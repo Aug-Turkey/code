@@ -5,111 +5,159 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <style>
-        .wrapper{
-            width: 500px;
-            height: 500px;
-            border: 1px solid #ccc;
-            margin: 50px 0 0 100px;
+        .login-header{
+            width: 100%;
+            text-align: center;
+        }
+
+        a{
+            text-decoration: none;
+            color: #000;
+        }
+
+        .login-header a{
+            font-size: 20px;
+        }
+
+        .login{
+            display: none;
+            width: 512px;
+            height: 280px;
+            box-shadow: 0 0 20px #ddd;
+            position: fixed;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%);
+            z-index: 9999;
+            background-color: #fff;
+            border: 1px solid #ededed;
+        }
+
+        .login-title{
+            text-align: center;
+            width: 100%;
+            height: 40px;
+            line-height: 40px;
+            font-size: 18px;
+            margin-top: 10px;
             position: relative;
         }
 
-        .image{
-            width: 500px;
-            height: 500px;
+        .close-login{
+            width: 40px;
+            height: 40px;
+            background-color: #fff;
+            border: 1px solid #ededed;
+            font-size: 14px;
+            border-radius: 50%;
+            box-shadow: 0 0 20px #ddd;
+            position: absolute;
+            right: -20px;
+            top: -30px;
         }
 
-        .cover{
+        .login-input-content{
+            width: 90%;
+            margin: 20px auto;
+            display: flex;
+            flex-wrap: wrap;
+            flex-direction: column
+        }
+
+        .username{
+            width: 80%;
+            line-height: 30px;
+            margin-left: 16px;
+        }
+
+        .password{
+            width: 80%;
+            line-height: 30px;
+        }
+
+        .register{
             width: 300px;
-            height: 300px;
-            background-color: rgb(207, 248, 111);
-            opacity: .5;
-            position: absolute;
-            top: 0;
-            left: 0;
-            cursor: move;
+            line-height: 40px;
+            border: 1px solid #dddcdc;
+            margin: 0 auto;
         }
 
-        .big{
-            width: 600px;
-            height: 600px;
-            border: 1px solid #ccc;
-            position: absolute;
-            top: 0;
-            left: 510px;
-            overflow: hidden;
+        .register-members{
+            display: block;
+            text-align: center;
         }
 
-        .bigImg{
-            width: 1000px;
-            height: 1000px;
-            position: absolute;
+        .login-bg{
+            display: none;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, .3);
+            position: fixed;
             top: 0;
             left: 0;
         }
     </style>
 </head>
 <body>
-    <div class="wrapper">
-        <img class="image" src="https://img10.360buyimg.com/n12/s800x800_jfs/t1/85203/17/16688/176934/614be5bfE28ca6187/6699eda01a9871e3.jpg" alt="">
-        <div class="cover"></div>
-        <div class="big">
-            <img class="bigImg" src="https://img10.360buyimg.com/n12/s800x800_jfs/t1/85203/17/16688/176934/614be5bfE28ca6187/6699eda01a9871e3.jpg" alt="">
+
+    <div class="login-header"><a id="link" href="javascript:;">点击，弹出登录框</a></div>
+    <div class="login">
+        <div class="login-title">登录会员
+            <span><a class="close-login" href="javascript:void(0);">关闭</a></span>
+        </div>
+        <div class="login-input-content">
+            <div class="login-input">
+                <label>用户名:</label>
+                <input type="text" placeholder="请输入用户名" name="info[username]" class="username">
+            </div>
+            <div class="login-input">
+                <label>登录密码:</label>
+                <input type="password" placeholder="请输入登录密码" name="info[password]" class="password">
+            </div>
+        </div>
+        <div class="register">
+            <a class="register-members" href="javascript:;">登录会员</a>
         </div>
     </div>
-    
+    <div class="login-bg"></div>
 
     <script>
-        var image = document.querySelector('.image');
-        var cover = document.querySelector('.cover');
-        var big = document.querySelector('.big');
-        var wrapper = document.querySelector('.wrapper');
+        var login_header = document.querySelector('.login-header');
+        var login = document.querySelector('.login');
+        var close_login = document.querySelector('.close-login');
+        var login_title = document.querySelector('.login-title');
+        var login_bg = document.querySelector('.login-bg');
 
-        wrapper.addEventListener('mouseover',function() {
-            cover.style.display = 'block';
-            big.style.display = 'block';
+        //弹出登录框
+        login_header.addEventListener('click',function() {
+            login.style.display = 'block';
+            login_bg.style.display = 'block';
         });
-        wrapper.addEventListener('mouseout',function() {
-            cover.style.display = 'none';
-            big.style.display = 'none';
+        //关闭登录框
+        close_login.addEventListener('click',function() {
+            login.style.display = 'none';
+            login_bg.style.display = 'none';
         });
 
-        //获取鼠标在盒子中的坐标
-        wrapper.addEventListener('mousemove',function(e) {
-            var x = e.pageX - wrapper.offsetLeft;
-            var y = e.pageY - wrapper.offsetTop;
-            //覆盖层移动的距离
-            var coverX = x - (cover.offsetWidth / 2);
-            var coverY = y - (cover.offsetHeight / 2);
-            if (coverX <= 0) {
-                coverX = 0;
-            } else if(coverX >= 200) {
-                coverX = 200;
-            }
-            if (coverY <= 0) {
-                coverY = 0;
-            } else if(coverY >= 200) {
-                coverY = 200;
-            }
-            //给覆盖层赋值
-            cover.style.left = coverX + 'px';
-            cover.style.top = coverY + 'px';
+        //设置模态框移动
+        login_title.addEventListener('mousedown',function(e) {
+            //得到鼠标在盒子中的坐标
+            var x = e.pageX - login.offsetLeft;
+            var y = e.pageY - login.offsetTop;
             
-            //大图片移动距离 = 遮挡层移动距离 * 大图片最大移动距离 / 遮挡层最大移动距离
+            //鼠标移动时，把鼠标在页面中的坐标，减去 鼠标在盒子中的坐标就是模态框的坐标
+            document.addEventListener('mousemove',move);
+            function move(e) {
+                login.style.left = e.pageX - x + 'px';
+                login.style.top = e.pageY - y + 'px';
+            }
 
-            //大图片最大移动距离
-            var bigImg = document.querySelector('.bigImg');
-            var bigMax = bigImg.offsetWidth - big.offsetWidth;
-
-            //遮挡层最大移动距离
-            var coverMax = wrapper.offsetWidth - cover.offsetWidth;
-
-            //大图片移动距离
-            var bigX = coverX * bigMax / coverMax;
-            var bigY = coverY * bigMax / coverMax;
-            //赋值
-            bigImg.style.left = -bigX + 'px';
-            bigImg.style.top = -bigY + 'px';
+            //鼠标弹起就让鼠标移动事件移除
+            document.addEventListener('mouseup',function() {
+                document.removeEventListener('mousemove',move);
+            });
         });
+
     </script>
 </body>
 </html>
