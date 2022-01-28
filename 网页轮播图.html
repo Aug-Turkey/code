@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
@@ -114,30 +115,8 @@
         var right_btn = document.querySelector('.right-btn');
         var btn = document.querySelector('.btn');
         var img = document.querySelector('.img');
-
-        function animate(obj, target,callback) {
-    clearTimeout(obj.timer);
-    obj.timer = setInterval(function () {
-        //步长值写到定时器里
-        //把步长值改为整数，不要出现小数的问题
-        // var step = Math.ceil((target - obj.offsetLeft) / 10);
-        var step = (target - obj.offsetLeft) / 10;
-        //如果是正值则向上取整，负值向下取整
-        step = step > 0 ? Math.ceil(step) : Math.floor(step);
-        if (obj.offsetLeft == target) {
-            //停止动画
-            clearTimeout(obj.timer);
-            //回调函数写到定时器结束里面
-            if (callback) {
-                //调用函数
-                callback();
-            }
-        }
-        //把每次加1 这个步长值改为一个慢慢变小的值 
-        //步长公式：（目标值 - 现在的位置）/ 10
-        obj.style.left = obj.offsetLeft + step + 'px';
-    }, 15);
-}
+        //单张图片宽度
+        var imgWidth = img.offsetWidth;
 
         wrapper.addEventListener('mouseenter', function () {
             btn.style.display = 'block';
@@ -164,11 +143,10 @@
                     circle.children[i].style.backgroundColor = 'rgba(0, 0, 0, .3)';
                 }
                 this.style.backgroundColor = 'white';
-                //图片移动距离：圆圈索引号 * 图片宽度
-                var imgWidth = img.offsetWidth;
                 var index = this.getAttribute('index');
                 cir = index;
                 num = index;
+                //图片移动距离：圆圈索引号 * 图片宽度
                 animate(image, -index * imgWidth);
             });
         }
@@ -179,46 +157,86 @@
         var num = 0;
         //圆圈的索引号
         var cir = 0;
+        //节流阀
+        var flag = true;
         right_btn.addEventListener('click', function () {
-            if (num == image.children.length - 1) {
-                num = 0;
-                image.style.left = 0;
+            if (flag) {
+                flag = false;
+                if (num == image.children.length - 1) {
+                    num = 0;
+                    image.style.left = 0;
+                }
+                num++;
+                cir++;
+                var imgWidth = img.offsetWidth;
+                animate(image, -imgWidth * num, function () {
+                    flag = true;
+                });
+                if (cir == circle.children.length) {
+                    cir = 0;
+                }
+                for (let i = 0; i < circle.children.length; i++) {
+                    circle.children[i].style.backgroundColor = 'rgba(0, 0, 0, .3)';
+                }
+                circle.children[cir].style.backgroundColor = 'white';
             }
-            num++;
-            cir++;
-            var imgWidth = img.offsetWidth;
-            animate(image, -imgWidth * num);
-            if (cir == circle.children.length) {
-                cir = 0;
-            }
-            for (let i = 0; i < circle.children.length; i++) {
-                circle.children[i].style.backgroundColor = 'rgba(0, 0, 0, .3)';
-            }
-            circle.children[cir].style.backgroundColor = 'white';
         });
 
         //设置左箭头
         left_btn.addEventListener('click', function () {
-            if (num == 0) {
-                num = 4;
+            if (flag) {
+                flag = false;
+                if (num == 0) {
+                    num = 4;
+                    image.style.left = -num * imgWidth + 'px';
+                }
+                num--;
+                cir--;
+                animate(image, -imgWidth * num, function () {
+                    flag = true;
+                });
+                if (cir < 0) {
+                    cir = circle.children.length - 1;
+                }
+                for (let i = 0; i < circle.children.length; i++) {
+                    circle.children[i].style.backgroundColor = 'rgba(0, 0, 0, .3)';
+                }
+                circle.children[cir].style.backgroundColor = 'white';
             }
-            num--;
-            cir--;
-            var imgWidth = img.offsetWidth;
-            animate(image, -imgWidth * num);
-            if (cir < 0) {
-                cir = circle.children.length - 1;
-            }
-            for (let i = 0; i < circle.children.length; i++) {
-                circle.children[i].style.backgroundColor = 'rgba(0, 0, 0, .3)';
-            }
-            circle.children[cir].style.backgroundColor = 'white';
         });
 
         //自动播放
         var timer = setInterval(function () {
             right_btn.click();
         }, 2000);
+
+        //动画函数封装
+        function animate(obj, target, callback) {
+            clearTimeout(obj.timer);
+            obj.timer = setInterval(function () {
+                //步长值写到定时器里
+                //把步长值改为整数，不要出现小数的问题
+                // var step = Math.ceil((target - obj.offsetLeft) / 10);
+                var step = (target - obj.offsetLeft) / 10;
+                //如果是正值则向上取整，负值向下取整
+                step = step > 0 ? Math.ceil(step) : Math.floor(step);
+                if (obj.offsetLeft == target) {
+                    //停止动画
+                    clearTimeout(obj.timer);
+                    //回调函数写到定时器结束里面
+                    // if (callback) {
+                    //     //调用函数
+                    //     callback();
+                    // }
+                    //短路运算  如果左边为false  则右边不运行
+                    callback && callback();
+                }
+                //把每次加1 这个步长值改为一个慢慢变小的值 
+                //步长公式：（目标值 - 现在的位置）/ 10
+                obj.style.left = obj.offsetLeft + step + 'px';
+            }, 15);
+        }
     </script>
 </body>
+
 </html>
