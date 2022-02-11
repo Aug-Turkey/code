@@ -1,1 +1,160 @@
 
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>聊天机器人</title>
+    <link rel="stylesheet" href="/ajax/案例/聊天机器人/css/main.css">
+    <link rel="stylesheet" href="/ajax/案例/聊天机器人/css/reset.css">
+    <script src="/ajax/案例/聊天机器人/js/jquery-1.12.4.min.js"></script>
+    <script src="/ajax/案例/聊天机器人/js/jquery-ui.min.js"></script>
+    <script src="/ajax/案例/聊天机器人/js/jquery.mousewheel.js"></script>
+    <script src="/ajax/案例/聊天机器人/js/scroll.js"></script>
+</head>
+
+<body>
+    <div class="wrap">
+        <!-- 头部 Header 区域 -->
+        <div class="header">
+            <h3>小思同学</h3>
+            <img src="img/person01.png" alt="icon" />
+        </div>
+        <!-- 中间 聊天内容区域 -->
+        <div class="main">
+            <ul class="talk_list" style="top: 0px;" id="talk_list">
+                <li class="left_word">
+                    <img src="/ajax/案例/聊天机器人/img/person01.png" /> <span>嗨,最近想我没?</span>
+                </li>
+                <li class="right_word">
+                    <!-- <img src="/ajax/案例/聊天机器人/img/person02.png" /> <span>你好哦</span> -->
+                </li>
+
+            </ul>
+            <div class="drag_bar" style="display: none;">
+                <div class="drager ui-draggable ui-draggable-handle" style="display: none; height: 412.628px;"></div>
+            </div>
+        </div>
+        <!-- 底部 消息编辑区域 -->
+        <div class="footer">
+            <img src="/ajax/案例/聊天机器人/img/person02.png" alt="icon" />
+            <input type="text" placeholder="说点什么吧..." class="input_txt" id="ipt" />
+            <input type="button" value="发 送" class="input_sub" id="btnSend" />
+        </div>
+    </div>
+    <!-- 语音   指定了src属性和autoplay 就会自动播放-->
+    <audio src="" id="voice" autoplay style="display: none;"></audio>
+    <script type="text/javascript" src="/ajax/案例/聊天机器人/js/scroll.js"></script>
+
+    <script>
+        $(function () {
+            // 初始化右侧滚动条
+            // 这个方法定义在scroll.js中
+            resetui()
+
+            // 为发送按钮绑定鼠标点击事件
+            $('#btnSend').on('click', function () {
+                var text = $('#ipt').val().trim()
+                if (text.length <= 0) {
+                    return $('#ipt').val('')
+                }
+                // 如果用户输入了聊天内容，则将聊天内容追加到页面上显示
+                $('#talk_list').append('<li class="right_word"><img src="/ajax/案例/聊天机器人/img/person02.png" /> <span>' + text + '</span></li>')
+                $('#ipt').val('')
+                // 重置滚动条的位置
+                resetui()
+                // 发起请求，获取聊天内容
+                getMsg(text)
+            })
+
+            // 获取聊天机器人发送回来的消息
+            function getMsg(text) {
+                $.ajax({
+                    method: 'GET',
+                    url: 'http://www.liulongbin.top:3006/api/robot',
+                    data: {
+                        spoken: text
+                    },
+                    success: function (res) {
+                        // console.log(res)
+                        if (res.message === 'success') {
+                            // 接收聊天消息
+                            var msg = res.data.info.text
+                            $('#talk_list').append('<li class="left_word"><img src="/ajax/案例/聊天机器人/img/person01.png" /> <span>' + msg + '</span></li>')
+                            // 重置滚动条的位置
+                            resetui()
+                            // 调用 getVoice 函数，把文本转化为语音
+                            getVoice(msg)
+                        }
+                    }
+                })
+            }
+
+            // 把文字转化为语音进行播放
+            function getVoice(text) {
+                $.ajax({
+                    method: 'GET',
+                    url: 'http://www.liulongbin.top:3006/api/synthesize',
+                    data: {
+                        text: text
+                    },
+                    success: function (res) {
+                        if (res.status === 200) {
+                            // 播放语音
+                            $('#voice').attr('src', res.voiceUrl)
+                        }
+                    }
+                })
+            }
+
+            // 为文本框绑定 keyup 事件
+            $('#ipt').on('keyup', function (e) {
+                if (e.keyCode === 13) {
+                    $('#btnSend').click()
+                }
+            })
+        })
+    </script>
+<!-- Code injected by live-server -->
+<script type="text/javascript">
+	// <![CDATA[  <-- For SVG support
+	if ('WebSocket' in window) {
+		(function () {
+			function refreshCSS() {
+				var sheets = [].slice.call(document.getElementsByTagName("link"));
+				var head = document.getElementsByTagName("head")[0];
+				for (var i = 0; i < sheets.length; ++i) {
+					var elem = sheets[i];
+					var parent = elem.parentElement || head;
+					parent.removeChild(elem);
+					var rel = elem.rel;
+					if (elem.href && typeof rel != "string" || rel.length == 0 || rel.toLowerCase() == "stylesheet") {
+						var url = elem.href.replace(/(&|\?)_cacheOverride=\d+/, '');
+						elem.href = url + (url.indexOf('?') >= 0 ? '&' : '?') + '_cacheOverride=' + (new Date().valueOf());
+					}
+					parent.appendChild(elem);
+				}
+			}
+			var protocol = window.location.protocol === 'http:' ? 'ws://' : 'wss://';
+			var address = protocol + window.location.host + window.location.pathname + '/ws';
+			var socket = new WebSocket(address);
+			socket.onmessage = function (msg) {
+				if (msg.data == 'reload') window.location.reload();
+				else if (msg.data == 'refreshcss') refreshCSS();
+			};
+			if (sessionStorage && !sessionStorage.getItem('IsThisFirstTime_Log_From_LiveServer')) {
+				console.log('Live reload enabled.');
+				sessionStorage.setItem('IsThisFirstTime_Log_From_LiveServer', true);
+			}
+		})();
+	}
+	else {
+		console.error('Upgrade your browser. This Browser is NOT supported WebSocket for Live-Reloading.');
+	}
+	// ]]>
+</script></body>
+
+</html>
