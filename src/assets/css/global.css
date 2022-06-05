@@ -26,3 +26,10 @@ body,
   margin-top: 15px;
 }
 
+.el-cascader-menu {
+  max-height: 200px;
+}
+
+.el-cascader {
+  width: 100%;
+}
